@@ -1,35 +1,34 @@
-# ASP.NET Core
-# Build and test ASP.NET Core projects targeting .NET Core.
-# Add steps that run tests, create a NuGet package, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
-- master
-
+ - master
 pool:
-  vmImage: 'windows-latest'
-
+ vmImage: 'windows-latest'
 variables:
-  buildConfiguration: 'Release'
-  
-  
+ buildConfiguration: 'Release'
 steps:
-
+# Download NuGet packages and project-specific tools
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
-  inputs:
-    command: restore
-    projects: '**/*.csproj'
+ inputs:
+ command: restore
+ projects: '**/*.csproj'
 
-task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
-  inputs:
-    projects: '**/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
-
+- task: DotNetCoreCLI@2
+ displayName: 'dotnet build'
+ inputs:
+ projects: '**/*.csproj'
+ arguments: '--configuration $(buildConfiguration)'
+# Run unit tests (e.g., MSTest, xUnit, NUnit)
+- task: DotNetCoreCLI@2
+ displayName: 'dotnet test'
+ inputs:
+ command: test
+ projects: '**/*.csproj'
+ arguments: '--configuration $(buildConfiguration)'
+# Publish artifacts to Azure Pipelines
 - task: DotNetCoreCLI@2
  displayName: 'dotnet publish'
  inputs: 
+18
  command: publish
  publishWebProjects: false
  projects: '**/*.csproj'
@@ -40,4 +39,12 @@ task: DotNetCoreCLI@2
  displayName: 'Publish Artifact: drop'
  inputs:
  artifactName: 'AzureDemoPipeline'
+# Deploy a Web Deploy package (ASP.NET)
+- task: AzureWebApp@1
+ displayName: Azure Web App Deploy
+ inputs:
+ appType: webApp
+ azureSubscription: 'AzureDemoPipelineSC'
+ appName: 'AzureDemoAppVitas'
+ package: $(Build.ArtifactStagingDirectory)/*.zip
 
