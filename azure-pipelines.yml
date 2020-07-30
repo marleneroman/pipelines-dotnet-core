@@ -21,14 +21,12 @@ steps:
     command: restore
     projects: '**/*.csproj'
 
-
 task: DotNetCoreCLI@2
   displayName: 'dotnet build'
   inputs:
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
-# Publish artifacts to Azure Pipelines
 - task: DotNetCoreCLI@2
  displayName: 'dotnet publish'
  inputs: 
