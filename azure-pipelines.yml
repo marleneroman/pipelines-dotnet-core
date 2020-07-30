@@ -16,16 +16,33 @@ variables:
 steps:
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet build restore'
+  displayName: 'dotnet restore'
   inputs:
     command: restore
     projects: '**/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: drop'
+
+task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
   inputs:
-   ArtifactName: 'AzureDemoPipeline'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+# Publish artifacts to Azure Pipelines
+- task: DotNetCoreCLI@2
+ displayName: 'dotnet publish'
+ inputs: 
+ command: publish
+ publishWebProjects: false
+ projects: '**/*.csproj'
+ arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+# Upload build artifacts
+- task: PublishBuildArtifacts@1
+ displayName: 'Publish Artifact: drop'
+ inputs:
+ artifactName: 'AzureDemoPipeline'
+
 
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
