@@ -28,7 +28,7 @@ steps:
 - task: DotNetCoreCLI@2
  displayName: 'dotnet publish'
  inputs: 
-18
+
  command: publish
  publishWebProjects: false
  projects: '**/*.csproj'
